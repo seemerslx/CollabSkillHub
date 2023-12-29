@@ -29,6 +29,36 @@ public class ContractorController : Controller
         return Ok(new { works });
     }
 
+    [HttpGet]
+    [ActionName("me")]
+    public async Task<IActionResult> GetMe()
+    {
+        var contractor = await WorkModel.Contractors
+            .GetFirstAsync(c => c.UserName == User.Identity!.Name, "Reviews.Customer");
+
+        if (contractor is null)
+            return NotFound("Contractor not found");
+
+        return Ok(contractor);
+    }
+
+    [HttpPost]
+    [ActionName("update-description")]
+    public async Task<IActionResult> UpdateDescription([FromBody] string description)
+    {
+        var contractor = await WorkModel.Contractors
+            .GetFirstAsync(c => c.UserName == User.Identity!.Name);
+
+        if (contractor is null)
+            return NotFound("Contractor not found");
+
+        contractor.Description = description;
+
+        await WorkModel.SaveChangesAsync();
+
+        return Ok("Description updated");
+    }
+
     [HttpPost]
     [ActionName("search")]
     public async Task<IActionResult> Search([FromBody] string name)

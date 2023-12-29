@@ -18,7 +18,7 @@ public class Work
     [MaxLength(450)] public string CustomerId { get; set; } = null!;
     public Customer Customer { get; set; } = null!;
 
-    [MaxLength(450)] public string? ContractorId { get; set; } = null!;
+    [MaxLength(450)] public string? ContractorId { get; set; }
     public Contractor? Contractor { get; set; } = null!;
 
     public Chat? Chat { get; set; }

@@ -6,6 +6,7 @@ import Home from "./pages/home/Home";
 import ContractorPage from "./pages/home/ContractorPage";
 import RequestPage from "./pages/requests/RequestPage";
 import Chats from "./pages/chats/Chats";
+import ReviewPage from "./pages/home/ReviewPage";
 
 const AppRoutes = [
     {
@@ -40,6 +41,10 @@ const AppRoutes = [
         path: '/chats/:id?',
         element: <Chats/>
     },
+    {
+        path: '/reviews/:id?',
+        element: <ReviewPage/>
+    }
 ];
 
 export default AppRoutes;

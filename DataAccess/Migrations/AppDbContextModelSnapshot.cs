@@ -135,6 +135,41 @@ namespace DataAccess.Migrations
                     b.ToTable("Requests");
                 });
 
+            modelBuilder.Entity("DataAccess.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContractorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Stars")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractorId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Review");
+                });
+
             modelBuilder.Entity("DataAccess.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -403,6 +438,10 @@ namespace DataAccess.Migrations
                 {
                     b.HasBaseType("DataAccess.Models.User");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasDiscriminator().HasValue("Contractor");
                 });
 
@@ -476,6 +515,25 @@ namespace DataAccess.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Work");
+                });
+
+            modelBuilder.Entity("DataAccess.Models.Review", b =>
+                {
+                    b.HasOne("DataAccess.Models.Contractor", "Contractor")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ContractorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Models.Customer", "Customer")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contractor");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("DataAccess.Models.Work", b =>
@@ -563,6 +621,8 @@ namespace DataAccess.Migrations
 
                     b.Navigation("Requests");
 
+                    b.Navigation("Reviews");
+
                     b.Navigation("Works");
                 });
 
@@ -571,6 +631,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Chats");
 
                     b.Navigation("Requests");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("Works");
                 });

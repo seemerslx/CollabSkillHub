@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {Nav} from "react-bootstrap";
 import {apiEndpoint} from "../../api";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {launchError} from "../../components/layout/Layout";
 
 const RequestPage = () => {
@@ -44,7 +44,8 @@ const RequestPage = () => {
                             <div className="card-body">
                                 <h5 className="card-title">{request['work']?.name}</h5>
                                 <h6 className="card-subtitle mb-2 text-muted">
-                                    Request from: {request['contractor']?.fullName}
+                                    Request from: <Link
+                                    to={'/reviews/' + request['contractor']?.id}>{request['contractor']?.fullName}</Link>
                                 </h6>
                                 <h6 className="card-subtitle mb-2 text-muted">
                                     For the work: {request['work']?.name}

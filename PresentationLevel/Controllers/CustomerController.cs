@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace PresentationLevel.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [Authorize(Roles = "Admin, Customer")]
 public class CustomerController : Controller
 {
@@ -23,6 +23,7 @@ public class CustomerController : Controller
     private IChatService ChatService { get; }
 
     [HttpGet]
+    [ActionName("")]
     public async Task<IActionResult> Get()
     {
         var customer = await WorkModel.Customers
@@ -53,6 +54,7 @@ public class CustomerController : Controller
     }
 
     [HttpPost]
+    [ActionName("")]
     public async Task<IActionResult> Post([FromBody] WorkDto workDto)
     {
         var customer = await WorkModel.Customers
@@ -87,6 +89,7 @@ public class CustomerController : Controller
     }
 
     [HttpPut("{id:int}")]
+    [ActionName("update")]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] WorkDto workDto)
     {
         var customer = await WorkModel.Customers
@@ -122,6 +125,7 @@ public class CustomerController : Controller
     }
 
     [HttpDelete("{id:int}")]
+    [ActionName("remove")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var customer = await WorkModel.Customers
@@ -145,7 +149,8 @@ public class CustomerController : Controller
         return Ok(work);
     }
 
-    [HttpGet("work/{id:int}")]
+    [HttpGet("{id:int}")]
+    [ActionName("work")]
     public async Task<IActionResult> GetWork([FromRoute] int id)
     {
         var customer = await WorkModel.Customers
@@ -163,7 +168,8 @@ public class CustomerController : Controller
         return Ok(work);
     }
 
-    [HttpGet("requests")]
+    [HttpGet]
+    [ActionName("requests")]
     public async Task<IActionResult> GetRequests()
     {
         var customer = await WorkModel.Customers
@@ -178,7 +184,8 @@ public class CustomerController : Controller
         return Ok(requests);
     }
 
-    [HttpPost("requests/{id:int}/{accept:bool}")]
+    [HttpPost("{id:int}/{accept:bool}")]
+    [ActionName("requests")]
     public async Task<IActionResult> PostRequest([FromRoute] int id, [FromRoute] bool accept)
     {
         var customer = await WorkModel.Customers
@@ -203,6 +210,7 @@ public class CustomerController : Controller
         {
             request.State = RequestState.Accepted;
             request.Work.State = State.Inprogress;
+            request.Work.ContractorId = request.ContractorId;
 
             await ChatService.CreateChatAsync(request.Work.Name, request.Work.CustomerId,
                 request.ContractorId, request.WorkId);
@@ -221,9 +229,9 @@ public class CustomerController : Controller
         return Ok(requests);
     }
 
-    [HttpPost]
-    [Route("close-chat/{id:int}")]
-    public async Task<IActionResult> CloseChat([FromRoute] int id)
+    [HttpPost("{id:int}")]
+    [ActionName("close-chat")]
+    public async Task<IActionResult> CloseChat([FromRoute] int id, [FromBody] ReviewDto reviewDto)
     {
         var customer = await WorkModel.Customers
             .GetFirstAsync(c => c.UserName == User.Identity!.Name);
@@ -237,11 +245,37 @@ public class CustomerController : Controller
         if (chat is null)
             return NotFound("Chat not found");
 
+        if (chat.Work.ContractorId is null)
+            return BadRequest("Contractor is not assigned");
+
+        var review = new Review
+        {
+            ContractorId = chat.Work.ContractorId,
+            CustomerId = chat.CustomerId,
+            Comment = reviewDto.Comment,
+            Date = DateTime.Now,
+            Stars = reviewDto.Stars
+        };
+
         chat.Work.State = State.Completed;
         chat.IsArchived = true;
 
+        await WorkModel.Reviews.AddAsync(review);
         await WorkModel.SaveChangesAsync();
 
         return Ok("Chat closed");
+    }
+
+    [HttpGet("{contractorId}")]
+    [ActionName("get-reviews")]
+    public async Task<IActionResult> GetReviews([FromRoute] string contractorId)
+    {
+        var contractor = await WorkModel.Contractors
+            .GetFirstAsync(r => r.Id == contractorId, "Reviews.Customer");
+
+        if (contractor is null)
+            return NotFound("Contractor not found");
+
+        return Ok(contractor);
     }
 }

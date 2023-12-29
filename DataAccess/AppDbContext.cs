@@ -53,6 +53,12 @@ public class AppDbContext : IdentityDbContext<User>
             .HasForeignKey(w => w.ContractorId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<Review>()
+            .HasOne(w => w.Contractor)
+            .WithMany(c => c.Reviews)
+            .HasForeignKey(w => w.ContractorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         base.OnModelCreating(builder);
     }
 }

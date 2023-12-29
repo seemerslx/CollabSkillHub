@@ -37,22 +37,23 @@ const ContractorPage = () => {
                     <Button variant={"outline-primary"} className={"ml-2"} type={'submit'}>Search</Button>
                 </form>
                 {
-                    projects.map((project) =>
-                        <Card className={'w-75 mt-3'}>
-                            <Card.Body>
-                                <Card.Title>{project.name}</Card.Title>
-                                <Card.Text>{project.description}</Card.Text>
-                                <Card.Text>Deadline: {project['deadline'] ? new Date(project['deadline']).toLocaleDateString() : 'Not specified'}</Card.Text>
-                                <Card.Text>Price: {project['price'] != null ? `$${project['price'].toFixed(2)}` : 'Not specified'}</Card.Text>
-                                <Button variant="outline-success" className={"mt-2 w-100"} onClick={() => {
-                                    setWorkId(project.id);
-                                    setOpen(true);
-                                }}>
-                                    Send offer
-                                </Button>
-                            </Card.Body>
-                        </Card>
-                    )
+                    projects.length === 0 ? <h3>No projects found</h3> :
+                        projects.map((project) =>
+                            <Card className={'w-75 mt-3'}>
+                                <Card.Body>
+                                    <Card.Title>{project.name}</Card.Title>
+                                    <Card.Text>{project.description}</Card.Text>
+                                    <Card.Text>Deadline: {project['deadline'] ? new Date(project['deadline']).toLocaleDateString() : 'Not specified'}</Card.Text>
+                                    <Card.Text>Price: {project['price'] != null ? `$${project['price'].toFixed(2)}` : 'Not specified'}</Card.Text>
+                                    <Button variant="outline-success" className={"mt-2 w-100"} onClick={() => {
+                                        setWorkId(project.id);
+                                        setOpen(true);
+                                    }}>
+                                        Send offer
+                                    </Button>
+                                </Card.Body>
+                            </Card>
+                        )
                 }
                 <RequestModal workId={workId} show={open} handleClose={() => setOpen(false)}/>
             </div>

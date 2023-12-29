@@ -31,6 +31,7 @@ const AppNavbar = () => {
                     {nav === 'customer' && <Nav.Link href="/dashboard">Home</Nav.Link>}
                     {nav === 'customer' && <Nav.Link href="/requests">Requests</Nav.Link>}
                     {nav === 'contractor' && <Nav.Link href="/works">Home</Nav.Link>}
+                    {nav === 'contractor' && <Nav.Link href="/reviews">Reviews</Nav.Link>}
                     {nav !== '' && <Nav.Link href="/chats">Chats</Nav.Link>}
                     {nav !== '' &&
                         <Nav.Link href="/login"

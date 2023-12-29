@@ -7,6 +7,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import signalRService from "../../api/signalR";
 import {launchError} from "../../components/layout/Layout";
 import {apiEndpoint} from "../../api";
+import CommentPopup from "../forms/CommentPopup";
 
 const Chats = () => {
     const [activeChat, setActiveChat] = useState(null);
@@ -15,6 +16,7 @@ const Chats = () => {
     const [show, setShow] = useState(false);
     const id = useParams().id;
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     const handleChatSelection = (chat) => {
         navigate(`/chats/${chat.id}`);
@@ -43,6 +45,9 @@ const Chats = () => {
 
     useEffect(() => {
         signalRService.onReceiveMessage((message) => {
+            if (message['chatId'] !== +id)
+                return;
+
             setMessages([...messages, message]);
 
             setTimeout(() => {
@@ -50,7 +55,7 @@ const Chats = () => {
                 scroll.scrollTop = scroll.scrollHeight;
             }, 100);
         });
-    }, [messages]);
+    }, [id, messages]);
 
     const handleSendClick = (event) => {
         event.preventDefault();
@@ -66,9 +71,7 @@ const Chats = () => {
     };
 
     const handleClose = () => {
-        apiEndpoint('customer/close-chat/' + id).post()
-            .then(() => navigate(0))
-            .catch((error) => launchError(error));
+        setOpen(true);
     }
 
     return (
@@ -77,16 +80,17 @@ const Chats = () => {
                 <Col xs={3} className="bg-light p-3">
                     <ListGroup>
                         {
-                            chats.map((chat) => (
-                                <ListGroup.Item
-                                    key={chat.id}
-                                    action
-                                    active={activeChat && activeChat.id === chat.id}
-                                    onClick={() => handleChatSelection(chat)}
-                                >
-                                    {chat.name} {chat['isArchived'] && '(Archived)'}
-                                </ListGroup.Item>
-                            ))
+                            chats.length === 0 ? <h3>No chats</h3> :
+                                chats.map((chat) => (
+                                    <ListGroup.Item
+                                        key={chat.id}
+                                        action
+                                        active={activeChat && activeChat.id === chat.id}
+                                        onClick={() => handleChatSelection(chat)}
+                                    >
+                                        {chat.name} {chat['isArchived'] && '(Archived)'}
+                                    </ListGroup.Item>
+                                ))
                         }
                     </ListGroup>
                 </Col>
@@ -143,6 +147,7 @@ const Chats = () => {
                             <p>Select a chat to start conversation</p>
                         </div>
                     )}
+                    <CommentPopup show={open} handleClose={() => setOpen(false)} id={id}/>
                 </Col>
             </Row>
         </Container>

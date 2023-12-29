@@ -18,6 +18,7 @@ public class UnitOfWork : IUnitOfWork
         Messages = new GenericRepository<Message>(_context);
         Chats = new GenericRepository<Chat>(_context);
         Requests = new GenericRepository<Request>(_context);
+        Reviews = new GenericRepository<Review>(_context);
     }
 
     public IGenericRepository<User> Users { get; }
@@ -27,6 +28,7 @@ public class UnitOfWork : IUnitOfWork
     public IGenericRepository<Message> Messages { get; }
     public IGenericRepository<Chat> Chats { get; }
     public IGenericRepository<Request> Requests { get; }
+    public IGenericRepository<Review> Reviews { get; }
 
     public async Task<int> SaveChangesAsync()
     {
