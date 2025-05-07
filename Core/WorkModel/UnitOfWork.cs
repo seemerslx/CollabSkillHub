@@ -19,6 +19,8 @@ public class UnitOfWork : IUnitOfWork
         Chats = new GenericRepository<Chat>(_context);
         Requests = new GenericRepository<Request>(_context);
         Reviews = new GenericRepository<Review>(_context);
+        Payments = new GenericRepository<Payment>(_context);
+        ContractorPaymentInfos = new GenericRepository<ContractorPaymentInfo>(_context);
     }
 
     public IGenericRepository<User> Users { get; }
@@ -29,6 +31,8 @@ public class UnitOfWork : IUnitOfWork
     public IGenericRepository<Chat> Chats { get; }
     public IGenericRepository<Request> Requests { get; }
     public IGenericRepository<Review> Reviews { get; }
+    public IGenericRepository<Payment> Payments { get; }
+    public IGenericRepository<ContractorPaymentInfo> ContractorPaymentInfos { get; }
 
     public async Task<int> SaveChangesAsync()
     {

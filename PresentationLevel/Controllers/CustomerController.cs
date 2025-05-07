@@ -266,6 +266,67 @@ public class CustomerController : Controller
         return Ok("Chat closed");
     }
 
+    [HttpPost("{paymentId:int}")]
+    [ActionName("mark-as-payed")]
+    public async Task<IActionResult> MarkAsPayed([FromRoute] int paymentId)
+    {
+        var customer = await WorkModel.Customers
+            .GetFirstAsync(c => c.UserName == User.Identity!.Name);
+
+        if (customer is null)
+            return NotFound("Customer not found");
+
+        var chat = await WorkModel.Payments
+            .GetFirstAsync(p => p.Id == paymentId && p.CustomerId == customer.Id, "Work");
+
+        if (chat is null)
+            return NotFound("Worknot found");
+
+        chat.Work.State = State.Paid;
+
+        await WorkModel.SaveChangesAsync();
+
+        return Ok("Work marked as paid");
+    }
+
+
+    [HttpPost("{id:int}")]
+    [ActionName("pay-contractor")]
+    public async Task<IActionResult> PayContractor([FromRoute] int id, [FromBody] ReviewDto reviewDto)
+    {
+        var customer = await WorkModel.Customers
+            .GetFirstAsync(c => c.UserName == User.Identity!.Name);
+
+        if (customer is null)
+            return NotFound("Customer not found");
+
+        var chat = await WorkModel.Chats
+            .GetFirstAsync(c => c.Id == id && c.CustomerId == customer.Id, "Work");
+
+        if (chat is null)
+            return NotFound("Chat not found");
+
+        if (chat.Work.ContractorId is null)
+            return BadRequest("Contractor is not assigned");
+
+        var review = new Review
+        {
+            ContractorId = chat.Work.ContractorId,
+            CustomerId = chat.CustomerId,
+            Comment = reviewDto.Comment,
+            Date = DateTime.Now,
+            Stars = reviewDto.Stars
+        };
+
+        chat.Work.State = State.Completed;
+        chat.IsArchived = true;
+
+        await WorkModel.Reviews.AddAsync(review);
+        await WorkModel.SaveChangesAsync();
+
+        return Ok("Chat closed");
+    }
+
     [HttpGet("{contractorId}")]
     [ActionName("get-reviews")]
     public async Task<IActionResult> GetReviews([FromRoute] string contractorId)

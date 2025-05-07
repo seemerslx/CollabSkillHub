@@ -1,37 +1,65 @@
 import React, {useEffect, useState} from 'react';
-import {Container, Row, Col, ListGroup, Form} from 'react-bootstrap';
+import {Container, Row, Col, ListGroup, Form, ButtonGroup} from 'react-bootstrap';
 import {InputGroup, FormControl, Button} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPaperPlane} from '@fortawesome/free-solid-svg-icons';
+import {faPaperPlane, faCheck, faCreditCard} from '@fortawesome/free-solid-svg-icons';
 import {useNavigate, useParams} from "react-router-dom";
 import signalRService from "../../api/signalR";
 import {launchError} from "../../components/layout/Layout";
 import {apiEndpoint} from "../../api";
 import CommentPopup from "../forms/CommentPopup";
+import PaymentModal from "../../components/PaymentModel";
 
 const Chats = () => {
     const [activeChat, setActiveChat] = useState(null);
     const [chats, setChats] = useState([]);
     const [messages, setMessages] = useState([]);
     const [show, setShow] = useState(false);
+    const [userRole, setUserRole] = useState(''); // 'customer' or 'contractor'
+    const [workState, setWorkState] = useState('');
+    const [canPay, setCanPay] = useState(false);
+    const [canMarkReady, setCanMarkReady] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const id = useParams().id;
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChatSelection = (chat) => {
         navigate(`/chats/${chat.id}`);
     };
 
-    useEffect(() => {
-        if (!id)
-            return;
+    const refreshChatData = () => {
+        if (!id) return;
 
         apiEndpoint('chat').fetchById(id)
             .then((response) => {
-                setActiveChat(response.data);
-                setMessages(response.data.messages);
+                setActiveChat(response.data.chat);
+                setMessages(response.data.chat.messages);
+                
+                // Set user role from response
+                setUserRole(response.data.userRole || '');
+
+                // Set work state if work exists
+                if (response.data.chat.work) {
+                    setWorkState(response.data.chat.work.state);
+                    
+                    // Set flags based on work state and user role
+                    const isContractor = response.data.userRole === 'contractor';
+                    const isCustomer = response.data.userRole === 'customer';
+                    
+                    // Contractor can mark as ready if work is in progress
+                    setCanMarkReady(isContractor && response.data.chat.work.state === 'Inprogress');
+                    
+                    // Customer can pay if work is ready for review
+                    setCanPay(isCustomer && response.data.chat.work.state === 'ReadyForReviewAndPay');
+                }
             })
             .catch((error) => launchError(error));
+    };
+
+    useEffect(() => {
+        refreshChatData();
     }, [id]);
 
     useEffect(() => {
@@ -52,7 +80,9 @@ const Chats = () => {
 
             setTimeout(() => {
                 const scroll = document.getElementById('scroll');
-                scroll.scrollTop = scroll.scrollHeight;
+                if (scroll) {
+                    scroll.scrollTop = scroll.scrollHeight;
+                }
             }, 100);
         });
     }, [id, messages]);
@@ -72,7 +102,62 @@ const Chats = () => {
 
     const handleClose = () => {
         setOpen(true);
-    }
+    };
+
+    const handleMarkAsReady = () => {
+        setIsLoading(true);
+        apiEndpoint(`contractor/mark-as-ready/${id}`).post()
+            .then(() => {
+                // Refresh chat data to update UI
+                refreshChatData();
+                // Optional: Show a success message
+                alert('Work marked as ready for review!');
+            })
+            .catch((error) => {
+                launchError(error);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    };
+
+    const handlePayClick = () => {
+        setShowPaymentModal(true);
+    };
+
+    const handlePaymentSuccess = () => {
+        // Refresh chat data after successful payment
+        refreshChatData();
+        setShowPaymentModal(false);
+    };
+
+    const getWorkStatusBadge = () => {
+        if (!activeChat || !activeChat.work) return null;
+        
+        let badgeClass = '';
+        let text = activeChat.work.state;
+        
+        switch (activeChat.work.state) {
+            case 'InProgress':
+                badgeClass = 'bg-info';
+                text = 'In Progress';
+                break;
+            case 'ReadyForReviewAndPay':
+                badgeClass = 'bg-warning';
+                text = 'Ready for Review';
+                break;
+            case 'Completed':
+                badgeClass = 'bg-success';
+                text = 'Completed';
+                break;
+            default:
+                badgeClass = 'bg-secondary';
+        }
+        
+        return (
+            <span className={`badge ${badgeClass} ms-2`}>{text}</span>
+        );
+    };
 
     return (
         <Container fluid className="h-100">
@@ -101,11 +186,45 @@ const Chats = () => {
                             <div className="d-flex justify-content-between align-items-center mb-3">
                                 <h4>
                                     {activeChat.name} {activeChat['isArchived'] && '(Archived)'}
+                                    {getWorkStatusBadge()}
                                 </h4>
-                                {
-                                    show && !activeChat['isArchived'] &&
-                                    <Button variant="success" onClick={handleClose}>Close Conversation</Button>
-                                }
+                                <ButtonGroup>
+                                    {/* Contractor: Mark as Ready button */}
+                                    {canMarkReady && (
+                                        <Button 
+                                            variant="primary" 
+                                            onClick={handleMarkAsReady}
+                                            disabled={isLoading}
+                                            className="me-2"
+                                        >
+                                            <FontAwesomeIcon icon={faCheck} className="me-1" />
+                                            Mark as Ready
+                                        </Button>
+                                    )}
+                                    
+                                    {/* Customer: Pay button */}
+                                    {canPay && (
+                                        <Button 
+                                            variant="primary" 
+                                            onClick={handlePayClick}
+                                            disabled={isLoading}
+                                            className="me-2"
+                                        >
+                                            <FontAwesomeIcon icon={faCreditCard} className="me-1" />
+                                            Pay
+                                        </Button>
+                                    )}
+                                    
+                                    {/* Close Conversation button */}
+                                    {show && !activeChat['isArchived'] && (
+                                        <Button 
+                                            variant="danger" 
+                                            onClick={handleClose}
+                                        >
+                                            Close Conversation
+                                        </Button>
+                                    )}
+                                </ButtonGroup>
                             </div>
 
                             <div style={{height: '65vh', overflowY: 'auto'}} id={'scroll'}>
@@ -147,7 +266,16 @@ const Chats = () => {
                             <p>Select a chat to start conversation</p>
                         </div>
                     )}
-                    <CommentPopup show={open} handleClose={() => setOpen(false)} id={id}/>
+                    <CommentPopup show={open} handleClose={() => setOpen(false)} id={id} />
+                    
+                    {/* Payment Modal */}
+                    {showPaymentModal && activeChat && activeChat.work && (
+                        <PaymentModal
+                            workId={activeChat.work.id}
+                            onClose={() => setShowPaymentModal(false)}
+                            onSuccess={handlePaymentSuccess}
+                        />
+                    )}
                 </Col>
             </Row>
         </Container>

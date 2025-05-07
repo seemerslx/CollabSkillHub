@@ -1,0 +1,252 @@
+﻿/* Modal styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalOpen 0.3s ease-out;
+}
+
+@keyframes modalOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+.close {
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+    .close:hover {
+        color: #333;
+    }
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+    .modal-footer button {
+        padding: 8px 16px;
+        margin-left: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #ddd;
+        cursor: pointer;
+    }
+
+        .modal-footer button:hover {
+            background-color: #ccc;
+        }
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Payment details styles */
+.payment-details {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+}
+
+    .payment-details h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .payment-details p {
+        margin: 8px 0;
+    }
+
+.payment-methods h3 {
+    margin-bottom: 15px;
+}
+
+.payment-options {
+    margin-top: 15px;
+}
+
+.payment-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.paypal-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0070ba;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+    .paypal-button:hover {
+        background-color: #005ea6;
+    }
+
+    .paypal-button img {
+        margin-right: 10px;
+        height: 20px;
+    }
+
+.error {
+    color: #d9534f;
+    padding: 10px;
+    background-color: #f9f2f2;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Pay button on work list */
+.pay-button {
+    background-color: #0070ba;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+    .pay-button:hover {
+        background-color: #005ea6;
+    }
+
+/* Payment success/cancel page styles */
+.payment-success-container,
+.payment-cancel-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.payment-success-card,
+.payment-cancel-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.success-icon,
+.cancel-icon {
+    margin: 0 auto 20px;
+    width: 64px;
+    height: 64px;
+}
+
+.return-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.payment-cancel-card .return-button {
+    background-color: #607D8B;
+}
+
+.return-button:hover {
+    opacity: 0.9;
+}
+
+.payment-details {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    text-align: left;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.error-message {
+    color: #F44336;
+    padding: 10px;
+    background-color: #FFEBEE;
+    border-radius: 4px;
+    margin: 20px 0;
+}

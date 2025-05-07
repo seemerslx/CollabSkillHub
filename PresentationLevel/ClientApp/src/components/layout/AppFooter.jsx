@@ -7,7 +7,7 @@ const AppFooter = () => {
             <Container>
                 <Row>
                     <Col className="text-center">
-                        <p>&copy; 2023 Collab Skill Hub. All rights reserved.</p>
+                        <p>&copy; 2025 Collab Skill Hub. All rights reserved.</p>
                     </Col>
                 </Row>
             </Container>

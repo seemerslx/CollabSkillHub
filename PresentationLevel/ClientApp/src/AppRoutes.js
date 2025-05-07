@@ -7,6 +7,9 @@ import ContractorPage from "./pages/home/ContractorPage";
 import RequestPage from "./pages/requests/RequestPage";
 import Chats from "./pages/chats/Chats";
 import ReviewPage from "./pages/home/ReviewPage";
+import ContractorProfilePage from "./pages/contractorprofile/ContratorProfilePage";
+import PaymentSuccessPage from "./pages/paymentsuccess/PaymentSuccessPage";
+import PaymentCancelPage from "./pages/paymentcancel/PaymentCancel";
 
 const AppRoutes = [
     {
@@ -44,6 +47,18 @@ const AppRoutes = [
     {
         path: '/reviews/:id?',
         element: <ReviewPage/>
+    },
+    {
+        path: '/contractor/profile',
+        element: <ContractorProfilePage/>
+    },
+    {
+        path: '/payment/success',
+        element: <PaymentSuccessPage/>
+    },
+    {
+        path: '/payment/cancelled',
+        element: <PaymentCancelPage/>
     }
 ];
 

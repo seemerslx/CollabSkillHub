@@ -62,9 +62,15 @@ builder.Services.AddAuthentication(opt =>
         };
     });
 
+builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
+builder.Services.AddScoped<PayPalHttpClientService>();
+builder.Services.AddScoped<PayPalOrderService>();
+builder.Services.AddScoped<PaymentService>();
 
 var app = builder.Build();
 

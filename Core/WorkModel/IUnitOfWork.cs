@@ -13,6 +13,8 @@ public interface IUnitOfWork : IDisposable
     IGenericRepository<Chat> Chats { get; }
     IGenericRepository<Request> Requests { get; }
     IGenericRepository<Review> Reviews { get; }
+    IGenericRepository<Payment> Payments { get; }
+    IGenericRepository<ContractorPaymentInfo> ContractorPaymentInfos { get; }
 
     Task<int> SaveChangesAsync();
 }
